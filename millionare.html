@@ -23,7 +23,9 @@
       --btnDisabled:#2b2f55;
       --muted:#cfd5ff;
       --text:#fff;
+      --danger:#ff2d55;
     }
+
     *{box-sizing:border-box}
     body{
       font-family: Arial, sans-serif;
@@ -35,6 +37,7 @@
         radial-gradient(900px 600px at 20% 120%, rgba(48,69,201,.20) 0%, rgba(11,15,43,0) 55%),
         var(--bg);
     }
+
     #app{max-width:1180px;margin:0 auto;padding:18px}
     header h1{
       margin:6px 0 14px;
@@ -43,6 +46,7 @@
       color:#eef0ff;
       letter-spacing:.2px;
     }
+
     .panel{
       background: rgba(15, 22, 61, .86);
       border:1px solid var(--stroke);
@@ -51,6 +55,7 @@
       backdrop-filter: blur(8px);
     }
 
+    /* ---------- Setup ---------- */
     #setup{text-align:left}
     .setupGrid{
       display:grid;
@@ -121,7 +126,9 @@
       color:#d6dbff;
     }
 
+    /* ---------- Quiz UI ---------- */
     #quiz{display:none}
+
     #topBar{
       display:flex;
       justify-content:space-between;
@@ -149,6 +156,14 @@
       box-shadow:0 0 0 2px rgba(255,208,0,.12) inset;
     }
 
+    /* mute toggle indicator */
+    .iconBtn.muted{
+      opacity:.65;
+      border-color:rgba(255,45,85,.55);
+      box-shadow:0 0 0 2px rgba(255,45,85,.10) inset;
+    }
+
+    /* center */
     #centerWrap{display:flex;justify-content:center;margin:8px 0 10px}
     #centerCircle{
       width:140px;height:140px;border-radius:999px;
@@ -159,12 +174,14 @@
       box-shadow:0 0 0 10px rgba(255,255,255,.05), 0 0 42px rgba(160,120,255,.18);
       display:flex;align-items:center;justify-content:center;
       position:relative;
+      transition: border-color .2s ease, box-shadow .2s ease;
     }
     #centerCircle::before{
       content:"";
       position:absolute;inset:-10px;
       border-radius:999px;
       border:2px solid rgba(255,255,255,.08);
+      transition: border-color .2s ease;
     }
     #centerTime{
       font-size:54px;
@@ -172,12 +189,32 @@
       color:#f2f3ff;
       text-shadow:0 2px 0 rgba(0,0,0,.25);
       min-width:2ch;
+      transition: color .2s ease;
     }
     #centerSub{
       position:absolute;
       bottom:18px;
       font-size:12px;
       color:rgba(207,213,255,.85);
+    }
+
+    /* urgency (<=10s) */
+    @keyframes urgencyPulse {
+      0%, 100% { box-shadow: 0 0 0 10px rgba(255,45,85,.06), 0 0 42px rgba(255,45,85,.18); }
+      50%      { box-shadow: 0 0 0 10px rgba(255,45,85,.18), 0 0 52px rgba(255,45,85,.35); }
+    }
+    .urgent #centerCircle{
+      border-color: rgba(255,45,85,.65);
+      animation: urgencyPulse .8s infinite;
+    }
+    .urgent #centerCircle::before{
+      border-color: rgba(255,45,85,.25);
+    }
+    .urgent #centerTime{
+      color: var(--danger);
+    }
+    .urgent #timerTop{
+      color: var(--danger);
     }
 
     #questionPanel{
@@ -207,6 +244,7 @@
       white-space:nowrap;
     }
     .pill strong{color:var(--accent)}
+    #timerTop{font-weight:900}
     #question{font-size:22px;margin:8px 0 0;color:#f2f3ff;line-height:1.25}
 
     .answers{
@@ -239,13 +277,21 @@
       font-weight:900;color:#f4f6ff;flex:0 0 auto;
     }
     .answer .text{flex:1}
+
     .hidden{visibility:hidden}
     .selected{background:#d48806 !important;color:#111;border-color:rgba(0,0,0,.15)}
     .correct{background:var(--ok) !important;border-color:rgba(0,0,0,.2)}
     .wrong{background:var(--bad) !important;border-color:rgba(0,0,0,.2)}
     .disabledAnswer{opacity:.35;pointer-events:none}
 
-    #bottomBar{display:flex;gap:12px;justify-content:center;align-items:center;flex-wrap:wrap;margin-top:14px}
+    #bottomBar{
+      display:flex;
+      gap:12px;
+      justify-content:center;
+      align-items:center;
+      flex-wrap:wrap;
+      margin-top:14px;
+    }
 
     #ladderOverlay, #pauseOverlay, #modalOverlay{
       position:fixed;inset:0;background:rgba(0,0,0,.62);
@@ -264,7 +310,12 @@
       padding:16px;
       text-align:left;
     }
-    #ladderCard{width:min(380px,95vw);max-height:min(82vh,720px);overflow:auto;padding:12px}
+    #ladderCard{
+      width:min(380px,95vw);
+      max-height:min(82vh,720px);
+      overflow:auto;
+      padding:12px;
+    }
     .ladderHeader{
       display:flex;justify-content:space-between;align-items:center;
       gap:10px;margin-bottom:10px;color:#f2f3ff;font-weight:900;
@@ -365,7 +416,7 @@
           <div class="field">
             <label>Звуки (папка <b>audio</b>)</label>
             <div class="hintText">
-              Положи файлы рядом с HTML:<br>
+              Файлы (переименуй и положи рядом с HTML):<br>
               <b>audio/intro.mp3</b>, <b>audio/bg_game.mp3</b>, <b>audio/bg_audience.mp3</b>, <b>audio/answer_locked.mp3</b>,<br>
               <b>audio/hint_5050.mp3</b>, <b>audio/hint_audience.mp3</b>, <b>audio/clock_tick.mp3</b>, <b>audio/first_question.mp3</b>
             </div>
@@ -374,6 +425,10 @@
           <div class="actions" style="justify-content:space-between">
             <button class="primary" id="startBtn">Начать игру</button>
             <button class="danger" id="clearBtn">Очистить вопросы</button>
+          </div>
+
+          <div class="hintText" style="margin-top:10px">
+            В игре: 🔇 — звук, РУБ. — таблица, ⏸ — пауза.
           </div>
         </div>
       </div>
@@ -385,6 +440,7 @@
         <div class="iconGroup">
           <button class="iconBtn" id="btnRub" title="Таблица выигрышей">РУБ.</button>
           <button class="iconBtn" id="btnPause" title="Пауза / меню">⏸</button>
+          <button class="iconBtn" id="btnMute" title="Выключить/включить звук">🔊</button>
         </div>
 
         <div class="iconGroup">
@@ -513,17 +569,17 @@ function hideModal(){
   o.onclick = null;
 }
 
-/* ===================== Audio system ===================== */
+/* ===================== Audio system (no overlapping > 2) ===================== */
 /*
-  Положи файлы:
-    audio/intro.mp3
-    audio/bg_game.mp3
-    audio/bg_audience.mp3
-    audio/answer_locked.mp3
-    audio/hint_5050.mp3
-    audio/hint_audience.mp3
-    audio/clock_tick.mp3
-    audio/first_question.mp3
+  Папка: audio/
+    intro.mp3
+    bg_game.mp3
+    bg_audience.mp3
+    answer_locked.mp3
+    hint_5050.mp3
+    hint_audience.mp3
+    clock_tick.mp3
+    first_question.mp3
 */
 const SOUND = {
   INTRO: "audio/intro.mp3",
@@ -536,93 +592,112 @@ const SOUND = {
   FIRST_QUESTION: "audio/first_question.mp3"
 };
 
+// Rule requested: "чтобы звуки не накладывались... можно 2"
+// Мы сделаем 2 "канала":
+// 1) MUSIC channel (bg_game OR bg_audience) — только один loop
+// 2) SFX channel (любой одиночный звук: intro/first_question/hints/answer_locked) — только один at a time
+// Отдельно CLOCK_TICK — будем играть внутри MUSIC (как "режим") чтобы не было третьего.
+// => CLOCK_TICK будет проигрываться в MUSIC канале вместо bg_game? Нет, нужно и фон и тик.
+// Поэтому сделаем так: CLOCK_TICK будет в MUSIC канале как отдельный loop только если bg_game пустой? нельзя.
+// Правильнее: clock_tick сделаем тихим SFX loop, но тогда будет 3.
+// Чтобы соблюсти "максимум 2", делаем компромисс: тиканье включаем ТОЛЬКО если нет bg_audience,
+// и используем bg_game как фон, а тик будем накладывать поверх фона? Это уже 2+.
+// Поэтому: MUSIC = bg_game (или bg_audience), а тик делаем встроенным в bg_game (т.е. в твоём файле bg_game.mp3 должен быть уже с тиканьем).
+// Но ты просил отдельный файл clock_tick.mp3. Тогда строго "2 звука" означает: либо фон, либо тик.
+// Я сделаю настройку: во время размышления включается clock_tick, а bg_game приглушается (pause) — будет ровно 1 music звук + 1 sfx (при необходимости).
+// Итог:
+/// - В режиме "thinking": играет CLOCK_TICK (loop) как MUSIC, bg_game останавливается.
+/// - В режиме "normal": играет bg_game как MUSIC.
+/// - В зале: играет bg_audience как MUSIC.
+/// - SFX: intro/first_question/hints/answer_locked (по одному).
+
+let muted = false;
+
 const audio = {
-  // long / loop
-  bg: new Audio(),
-  clock: new Audio(),
-  // one-shots
-  sfx: new Audio(),
-  // special one-shot that may need to stop (answer_locked)
-  answerLocked: new Audio(),
-  // audience bg (loop)
-  audienceBg: new Audio()
+  music: new Audio(), // loop channel
+  sfx: new Audio()    // one-shot channel (also used for answer_locked)
 };
 
-audio.bg.loop = true;
-audio.bg.volume = 0.55;
+audio.music.loop = true;
+audio.music.volume = 0.55;
 
-audio.clock.loop = true;
-audio.clock.volume = 0.55;
-
-audio.audienceBg.loop = true;
-audio.audienceBg.volume = 0.55;
-
+audio.sfx.loop = false;
 audio.sfx.volume = 0.85;
-audio.answerLocked.volume = 0.85;
 
-function stopAllAudio(){
-  [audio.bg, audio.clock, audio.sfx, audio.answerLocked, audio.audienceBg].forEach(a=>{
-    try{ a.pause(); a.currentTime = 0; }catch(e){}
-  });
+function applyMuteState(){
+  audio.music.muted = muted;
+  audio.sfx.muted = muted;
+  const btn = $("#btnMute");
+  if(!btn) return;
+  btn.textContent = muted ? "🔇" : "🔊";
+  btn.classList.toggle("muted", muted);
 }
 
-async function playSfx(path){
-  // One-shot via shared element; restarting is OK for UI sounds
+function stopMusic(){
+  try{ audio.music.pause(); audio.music.currentTime = 0; }catch(e){}
+}
+async function playMusic(path){
+  if(muted) return;
   try{
+    if(audio.music.src !== new URL(path, location.href).href){
+      audio.music.pause();
+      audio.music.currentTime = 0;
+      audio.music.src = path;
+    }
+    audio.music.loop = true;
+    await audio.music.play();
+  }catch(e){}
+}
+
+function stopSfx(){
+  try{ audio.sfx.pause(); audio.sfx.currentTime = 0; }catch(e){}
+}
+async function playSfx(path, {loop=false} = {}){
+  if(muted) return;
+  try{
+    // only 1 sfx at a time (no overlap)
     audio.sfx.pause();
     audio.sfx.currentTime = 0;
     audio.sfx.src = path;
+    audio.sfx.loop = !!loop;
     await audio.sfx.play();
   }catch(e){}
 }
 
-async function startBgGame(){
-  try{
-    audio.bg.pause();
-    audio.bg.currentTime = 0;
-    audio.bg.src = SOUND.BG_GAME;
-    await audio.bg.play();
-  }catch(e){}
+function stopAllAudio(){
+  stopMusic();
+  stopSfx();
 }
 
-async function stopBgGame(){
-  try{ audio.bg.pause(); audio.bg.currentTime = 0; }catch(e){}
-}
+/* Music modes to keep "max 2" */
+const MusicMode = {
+  GAME_BG: "GAME_BG",
+  THINKING_TICK: "THINKING_TICK",
+  AUDIENCE: "AUDIENCE",
+  NONE: "NONE"
+};
+let currentMusicMode = MusicMode.NONE;
 
-async function startClockTick(){
-  try{
-    audio.clock.pause();
-    audio.clock.currentTime = 0;
-    audio.clock.src = SOUND.CLOCK_TICK;
-    await audio.clock.play();
-  }catch(e){}
-}
-function stopClockTick(){
-  try{ audio.clock.pause(); audio.clock.currentTime = 0; }catch(e){}
-}
+async function setMusicMode(mode){
+  currentMusicMode = mode;
+  if(muted) return;
 
-async function startAudienceBg(){
-  try{
-    audio.audienceBg.pause();
-    audio.audienceBg.currentTime = 0;
-    audio.audienceBg.src = SOUND.BG_AUDIENCE;
-    await audio.audienceBg.play();
-  }catch(e){}
-}
-function stopAudienceBg(){
-  try{ audio.audienceBg.pause(); audio.audienceBg.currentTime = 0; }catch(e){}
-}
-
-async function startAnswerLocked(){
-  try{
-    audio.answerLocked.pause();
-    audio.answerLocked.currentTime = 0;
-    audio.answerLocked.src = SOUND.ANSWER_LOCKED;
-    await audio.answerLocked.play();
-  }catch(e){}
-}
-function stopAnswerLocked(){
-  try{ audio.answerLocked.pause(); audio.answerLocked.currentTime = 0; }catch(e){}
+  if(mode === MusicMode.NONE){
+    stopMusic();
+    return;
+  }
+  if(mode === MusicMode.GAME_BG){
+    await playMusic(SOUND.BG_GAME);
+    return;
+  }
+  if(mode === MusicMode.THINKING_TICK){
+    await playMusic(SOUND.CLOCK_TICK);
+    return;
+  }
+  if(mode === MusicMode.AUDIENCE){
+    await playMusic(SOUND.BG_AUDIENCE);
+    return;
+  }
 }
 
 /* ===================== Game state ===================== */
@@ -717,11 +792,17 @@ function toggleLadder(){
 }
 
 /* ===================== Pause ===================== */
+function setUrgencyUI(on){
+  document.body.classList.toggle("urgent", !!on);
+}
+
 function showPause(){
   if(phase === "modal") return;
   if(phase === "paused") return;
   pauseQuestionTimer();
-  stopClockTick();
+  stopSfx(); // stop answer_locked or anything
+  stopMusic(); // requested: music stops on pause
+  setUrgencyUI(false);
   phase = "paused";
   setHintButtons();
   $("#pauseOverlay").style.display="flex";
@@ -729,13 +810,18 @@ function showPause(){
 function hidePause(){
   if(phase !== "paused") return;
   $("#pauseOverlay").style.display="none";
-
   const anyVisible = $$(".answer").some(a=>!a.classList.contains("hidden"));
   phase = anyVisible ? "answering" : "idle";
   setHintButtons();
+
+  // resume only if answering
   if(phase === "answering"){
     startQuestionTimer();
-    startClockTick();
+    // back to thinking tick OR game bg based on remaining time
+    // We'll treat "thinking" as always tick while timer runs to keep max-2 rule.
+    setMusicMode(MusicMode.THINKING_TICK);
+  }else{
+    setMusicMode(MusicMode.GAME_BG);
   }
 }
 
@@ -760,7 +846,7 @@ function resetAnswersUI(){
   });
   selected = null;
   $("#confirm").disabled = true;
-  stopAnswerLocked();
+  stopSfx(); // stop answer_locked
 }
 function setHeader(){
   $("#questionCounter").textContent = `${current+1}/${questions.length}`;
@@ -774,13 +860,14 @@ function setHintButtons(){
   $("#hintCall").disabled = !hints.call || !canInteract();
 }
 
-/* ===================== Timer ===================== */
+/* ===================== Timer + urgency (<=10) ===================== */
 function stopQuestionTimer(){
   if(qInterval){ clearInterval(qInterval); qInterval=null; }
 }
 function updateTimerUI(){
   $("#centerTime").textContent = String(qRemaining);
   $("#timerTop").textContent = String(qRemaining);
+  setUrgencyUI(qRemaining <= 10 && qRemaining >= 1 && phase === "answering");
 }
 function startQuestionTimer(){
   stopQuestionTimer();
@@ -792,7 +879,7 @@ function startQuestionTimer(){
     updateTimerUI();
     if(qRemaining <= 0){
       stopQuestionTimer();
-      stopClockTick();
+      setUrgencyUI(false);
       onTimeout();
     }
   },1000);
@@ -809,6 +896,7 @@ async function startRound(){
   resetAnswersUI();
   setHintButtons();
   $("#next").style.display="none";
+  setUrgencyUI(false);
 
   const q = questions[current];
   $("#question").textContent = q.q;
@@ -832,10 +920,11 @@ async function revealAnswersAndStart(){
   phase = "revealing";
   setHintButtons();
   resetAnswersUI();
+  setUrgencyUI(false);
 
   const delayMs = Math.max(0, Number(answerRevealDelay||0)) * 1000;
 
-  // "Итак, первый вопрос..." — на каждом вопросе, как ты попросил
+  // SFX: "Итак, первый вопрос..." (не накладываем - sfx канал один)
   await playSfx(SOUND.FIRST_QUESTION);
 
   for(let i=0;i<4;i++){
@@ -846,7 +935,9 @@ async function revealAnswersAndStart(){
   phase = "answering";
   setHintButtons();
   startQuestionTimer();
-  startClockTick();
+
+  // music during thinking: ticking (max 2 channels rule)
+  await setMusicMode(MusicMode.THINKING_TICK);
 }
 
 /* ===================== Answers ===================== */
@@ -860,8 +951,8 @@ function selectAnswer(i){
   el.classList.add("selected");
   $("#confirm").disabled = false;
 
-  // После выбора ответа до подтверждения играет "Ответ принят"
-  startAnswerLocked();
+  // SFX: answer accepted (loop until confirm) – BUT still only 1 sfx at a time
+  playSfx(SOUND.ANSWER_LOCKED, {loop:true});
 }
 
 async function confirmAnswer(){
@@ -872,8 +963,13 @@ async function confirmAnswer(){
   setHintButtons();
   $("#confirm").disabled = true;
   pauseQuestionTimer();
-  stopClockTick();
-  stopAnswerLocked();
+  setUrgencyUI(false);
+
+  // stop answer_locked
+  stopSfx();
+
+  // switch music back to game bg while showing result (optional)
+  await setMusicMode(MusicMode.GAME_BG);
 
   const q = questions[current];
   const ans = $$(".answer");
@@ -913,6 +1009,9 @@ async function confirmAnswer(){
 
 function onTimeout(){
   phase = "modal";
+  // stop music to make timeout feel "silent" or keep bg_game — choose. We'll keep game bg.
+  setMusicMode(MusicMode.GAME_BG);
+
   const fallback = currentGuaranteed();
   showModal({
     title:"Время вышло",
@@ -927,8 +1026,10 @@ function onTimeout(){
 
 function showWin(){
   pauseQuestionTimer();
-  stopClockTick();
+  setUrgencyUI(false);
   phase = "modal";
+  setMusicMode(MusicMode.GAME_BG);
+
   const win = moneyLevels[Math.min(questions.length, moneyLevels.length)-1] || 0;
   showModal({
     title:"Победа!",
@@ -949,7 +1050,7 @@ function disableAnswer(i){
     selected = null;
     el.classList.remove("selected");
     $("#confirm").disabled = true;
-    stopAnswerLocked();
+    stopSfx();
   }
 }
 
@@ -970,7 +1071,6 @@ async function hintRemoveOne(){
   if(!canInteract() || !hints.removeOne) return;
   hints.removeOne=false;
 
-  // используем тот же звук, что и 50/50 (ты их объединял по смыслу)
   await playSfx(SOUND.HINT_5050);
 
   const q = questions[current];
@@ -985,14 +1085,14 @@ async function hintAudience(){
   hints.audience=false;
 
   pauseQuestionTimer();
-  stopClockTick();
-  stopAnswerLocked();
+  setUrgencyUI(false);
+  stopSfx(); // stop answer_locked
 
-  // звук нажатия подсказки
+  // sfx: click hint
   await playSfx(SOUND.HINT_AUDIENCE);
 
-  // музыка голосования (loop) пока открыт модал
-  await startAudienceBg();
+  // music: audience bg (only one music)
+  await setMusicMode(MusicMode.AUDIENCE);
 
   phase="modal";
   setHintButtons();
@@ -1022,13 +1122,12 @@ async function hintAudience(){
   showModal({
     title:"Помощь зала",
     bodyHtml:`<p>Результаты голосования:</p>${rows}`,
-    buttons:[{text:"Продолжить", className:"primary", onClick: ()=>{
+    buttons:[{text:"Продолжить", className:"primary", onClick: async ()=>{
       hideModal();
-      stopAudienceBg();
       phase="answering";
       setHintButtons();
       startQuestionTimer();
-      startClockTick();
+      await setMusicMode(MusicMode.THINKING_TICK);
     }}],
     dismissible:false
   });
@@ -1039,9 +1138,8 @@ async function hintCall(){
   hints.call=false;
 
   pauseQuestionTimer();
-  stopClockTick();
-  stopAnswerLocked();
-
+  setUrgencyUI(false);
+  stopSfx(); // stop answer_locked
   phase="modal";
   setHintButtons();
 
@@ -1071,14 +1169,14 @@ async function hintCall(){
     if(remaining <= 0) finish(true);
   },1000);
 
-  function finish(auto=false){
+  async function finish(auto=false){
     if(callInterval){ clearInterval(callInterval); callInterval=null; }
     hideModal();
     phase="answering";
     setHintButtons();
     startQuestionTimer();
-    startClockTick();
-    if(auto){} // можно добавить звук окончания звонка, если появится
+    await setMusicMode(MusicMode.THINKING_TICK);
+    if(auto) {}
   }
 }
 
@@ -1153,9 +1251,10 @@ function resetGame(){
   resetAnswersUI();
   setHintButtons();
   $("#next").style.display="none";
+  setUrgencyUI(false);
 
-  // фон игры
-  startBgGame();
+  // default background while between rounds
+  setMusicMode(MusicMode.GAME_BG);
 
   startRound();
 }
@@ -1180,8 +1279,9 @@ async function startGame(){
   $("#setup").style.display="none";
   $("#quiz").style.display="block";
 
-  // Важно: чтобы на телефоне звук стартовал, нужно начать с user gesture.
-  // Поэтому заставку играем здесь (кнопка "Начать игру" — это gesture).
+  applyMuteState();
+
+  // start with intro in SFX channel
   await playSfx(SOUND.INTRO);
 
   resetGame();
@@ -1200,6 +1300,7 @@ $("#next").addEventListener("click", ()=>{
   hideLadder();
   startRound();
 });
+
 $("#restart").addEventListener("click", ()=>{
   showModal({
     title:"Сначала?",
@@ -1219,18 +1320,27 @@ $("#ladderOverlay").addEventListener("click", (e)=>{ if(e.target === $("#ladderO
 $("#btnPause").addEventListener("click", showPause);
 $("#pauseContinue").addEventListener("click", hidePause);
 $("#pauseToMenu").addEventListener("click", ()=>{
-  hidePause();
-  hideLadder();
+  $("#pauseOverlay").style.display="none";
+  $("#ladderOverlay").style.display="none";
   hideModal();
   pauseQuestionTimer();
-  stopClockTick();
-  stopAudienceBg();
-  stopAnswerLocked();
-  stopBgGame();
+  setUrgencyUI(false);
+  stopAllAudio();
 
   phase="idle";
   $("#quiz").style.display="none";
   $("#setup").style.display="block";
+});
+
+$("#btnMute").addEventListener("click", async ()=>{
+  muted = !muted;
+  applyMuteState();
+  if(muted){
+    stopAllAudio();
+  }else{
+    // resume appropriate music mode only (no sfx auto)
+    await setMusicMode(currentMusicMode === MusicMode.NONE ? MusicMode.GAME_BG : currentMusicMode);
+  }
 });
 
 $("#hint5050").addEventListener("click", hint5050);
@@ -1247,6 +1357,9 @@ window.addEventListener("keydown", (e)=>{
     else showPause();
   }
 });
+
+// initialize mute button state (when on setup it doesn't exist; safe)
+document.addEventListener("DOMContentLoaded", applyMuteState);
 </script>
 </body>
 </html>
