@@ -25,7 +25,6 @@
       --text:#fff;
       --danger:#ff2d55;
     }
-
     *{box-sizing:border-box}
     body{
       font-family: Arial, sans-serif;
@@ -37,7 +36,6 @@
         radial-gradient(900px 600px at 20% 120%, rgba(48,69,201,.20) 0%, rgba(11,15,43,0) 55%),
         var(--bg);
     }
-
     #app{max-width:1180px;margin:0 auto;padding:18px}
     header h1{
       margin:6px 0 14px;
@@ -46,7 +44,6 @@
       color:#eef0ff;
       letter-spacing:.2px;
     }
-
     .panel{
       background: rgba(15, 22, 61, .86);
       border:1px solid var(--stroke);
@@ -55,7 +52,6 @@
       backdrop-filter: blur(8px);
     }
 
-    /* ---------- Setup ---------- */
     #setup{text-align:left}
     .setupGrid{
       display:grid;
@@ -126,9 +122,7 @@
       color:#d6dbff;
     }
 
-    /* ---------- Quiz UI ---------- */
     #quiz{display:none}
-
     #topBar{
       display:flex;
       justify-content:space-between;
@@ -155,15 +149,12 @@
       border-color:rgba(255,208,0,.55);
       box-shadow:0 0 0 2px rgba(255,208,0,.12) inset;
     }
-
-    /* mute toggle indicator */
     .iconBtn.muted{
       opacity:.65;
       border-color:rgba(255,45,85,.55);
       box-shadow:0 0 0 2px rgba(255,45,85,.10) inset;
     }
 
-    /* center */
     #centerWrap{display:flex;justify-content:center;margin:8px 0 10px}
     #centerCircle{
       width:140px;height:140px;border-radius:999px;
@@ -198,7 +189,6 @@
       color:rgba(207,213,255,.85);
     }
 
-    /* urgency (<=10s) */
     @keyframes urgencyPulse {
       0%, 100% { box-shadow: 0 0 0 10px rgba(255,45,85,.06), 0 0 42px rgba(255,45,85,.18); }
       50%      { box-shadow: 0 0 0 10px rgba(255,45,85,.18), 0 0 52px rgba(255,45,85,.35); }
@@ -210,12 +200,8 @@
     .urgent #centerCircle::before{
       border-color: rgba(255,45,85,.25);
     }
-    .urgent #centerTime{
-      color: var(--danger);
-    }
-    .urgent #timerTop{
-      color: var(--danger);
-    }
+    .urgent #centerTime{ color: var(--danger); }
+    .urgent #timerTop{ color: var(--danger); }
 
     #questionPanel{
       border-radius:18px;
@@ -342,7 +328,6 @@
   <div id="app">
     <header><h1>Кто хочет стать миллионером</h1></header>
 
-    <!-- SETUP -->
     <div id="setup" class="panel">
       <div class="setupGrid">
         <div class="panel" style="background:rgba(255,255,255,.04)">
@@ -383,7 +368,6 @@
             <div class="field">
               <label>Задержка между появлениями ответов (сек)</label>
               <input id="answerRevealDelay" type="number" min="0" max="10" value="0.6" step="0.1" />
-              <div class="hintText">0 = показать все ответы сразу.</div>
             </div>
             <div class="field">
               <label>Количество вопросов (0 = все, максимум 15)</label>
@@ -416,9 +400,9 @@
           <div class="field">
             <label>Звуки (папка <b>audio</b>)</label>
             <div class="hintText">
-              Файлы (переименуй и положи рядом с HTML):<br>
-              <b>audio/intro.mp3</b>, <b>audio/bg_game.mp3</b>, <b>audio/bg_audience.mp3</b>, <b>audio/answer_locked.mp3</b>,<br>
-              <b>audio/hint_5050.mp3</b>, <b>audio/hint_audience.mp3</b>, <b>audio/clock_tick.mp3</b>, <b>audio/first_question.mp3</b>
+              <b>audio/intro.mp3</b>, <b>audio/first_question.mp3</b>, <b>audio/clock_tick.mp3</b>, <b>audio/lock_in.mp3</b>,<br>
+              <b>audio/answer_locked.mp3</b>, <b>audio/hint_5050.mp3</b>, <b>audio/hint_audience.mp3</b>, <b>audio/bg_audience.mp3</b>,<br>
+              <b>audio/correct_hard.mp3</b>, <b>audio/wrong.mp3</b>, <b>audio/next_question.mp3</b>
             </div>
           </div>
 
@@ -426,28 +410,23 @@
             <button class="primary" id="startBtn">Начать игру</button>
             <button class="danger" id="clearBtn">Очистить вопросы</button>
           </div>
-
-          <div class="hintText" style="margin-top:10px">
-            В игре: 🔇 — звук, РУБ. — таблица, ⏸ — пауза.
-          </div>
         </div>
       </div>
     </div>
 
-    <!-- QUIZ -->
     <div id="quiz">
       <div id="topBar">
         <div class="iconGroup">
-          <button class="iconBtn" id="btnRub" title="Таблица выигрышей">РУБ.</button>
-          <button class="iconBtn" id="btnPause" title="Пауза / меню">⏸</button>
+          <button class="iconBtn" id="btnRub">РУБ.</button>
+          <button class="iconBtn" id="btnPause">⏸</button>
           <button class="iconBtn" id="btnMute" title="Выключить/включить звук">🔊</button>
         </div>
 
         <div class="iconGroup">
-          <button class="iconBtn" id="hint5050" title="50/50">50:50</button>
-          <button class="iconBtn" id="hintRemoveOne" title="Убрать 1">✂</button>
-          <button class="iconBtn" id="hintAudience" title="Помощь зала">👥</button>
-          <button class="iconBtn" id="hintCall" title="Звонок другу">📞</button>
+          <button class="iconBtn" id="hint5050">50:50</button>
+          <button class="iconBtn" id="hintRemoveOne">✂</button>
+          <button class="iconBtn" id="hintAudience">👥</button>
+          <button class="iconBtn" id="hintCall">📞</button>
         </div>
       </div>
 
@@ -484,7 +463,6 @@
     </div>
   </div>
 
-  <!-- ladder -->
   <div id="ladderOverlay">
     <div id="ladderCard">
       <div class="ladderHeader">
@@ -495,7 +473,6 @@
     </div>
   </div>
 
-  <!-- pause -->
   <div id="pauseOverlay">
     <div id="pauseCard">
       <h2>Пауза</h2>
@@ -507,7 +484,6 @@
     </div>
   </div>
 
-  <!-- modal -->
   <div id="modalOverlay">
     <div class="modal" role="dialog" aria-modal="true">
       <h2 id="modalTitle"></h2>
@@ -569,68 +545,41 @@ function hideModal(){
   o.onclick = null;
 }
 
-/* ===================== Audio system (no overlapping > 2) ===================== */
-/*
-  Папка: audio/
-    intro.mp3
-    bg_game.mp3
-    bg_audience.mp3
-    answer_locked.mp3
-    hint_5050.mp3
-    hint_audience.mp3
-    clock_tick.mp3
-    first_question.mp3
-*/
+/* ===================== Audio (max 2 simultaneous: music + sfx) ===================== */
 const SOUND = {
   INTRO: "audio/intro.mp3",
-  BG_GAME: "audio/bg_game.mp3",
-  BG_AUDIENCE: "audio/bg_audience.mp3",
+  FIRST_QUESTION: "audio/first_question.mp3",
+  CLOCK_TICK: "audio/clock_tick.mp3",
+  LOCK_IN: "audio/lock_in.mp3",
   ANSWER_LOCKED: "audio/answer_locked.mp3",
   HINT_5050: "audio/hint_5050.mp3",
   HINT_AUDIENCE: "audio/hint_audience.mp3",
-  CLOCK_TICK: "audio/clock_tick.mp3",
-  FIRST_QUESTION: "audio/first_question.mp3"
+  BG_AUDIENCE: "audio/bg_audience.mp3",
+  CORRECT_HARD: "audio/correct_hard.mp3",
+  WRONG: "audio/wrong.mp3",
+  NEXT_QUESTION: "audio/next_question.mp3"
 };
-
-// Rule requested: "чтобы звуки не накладывались... можно 2"
-// Мы сделаем 2 "канала":
-// 1) MUSIC channel (bg_game OR bg_audience) — только один loop
-// 2) SFX channel (любой одиночный звук: intro/first_question/hints/answer_locked) — только один at a time
-// Отдельно CLOCK_TICK — будем играть внутри MUSIC (как "режим") чтобы не было третьего.
-// => CLOCK_TICK будет проигрываться в MUSIC канале вместо bg_game? Нет, нужно и фон и тик.
-// Поэтому сделаем так: CLOCK_TICK будет в MUSIC канале как отдельный loop только если bg_game пустой? нельзя.
-// Правильнее: clock_tick сделаем тихим SFX loop, но тогда будет 3.
-// Чтобы соблюсти "максимум 2", делаем компромисс: тиканье включаем ТОЛЬКО если нет bg_audience,
-// и используем bg_game как фон, а тик будем накладывать поверх фона? Это уже 2+.
-// Поэтому: MUSIC = bg_game (или bg_audience), а тик делаем встроенным в bg_game (т.е. в твоём файле bg_game.mp3 должен быть уже с тиканьем).
-// Но ты просил отдельный файл clock_tick.mp3. Тогда строго "2 звука" означает: либо фон, либо тик.
-// Я сделаю настройку: во время размышления включается clock_tick, а bg_game приглушается (pause) — будет ровно 1 music звук + 1 sfx (при необходимости).
-// Итог:
-/// - В режиме "thinking": играет CLOCK_TICK (loop) как MUSIC, bg_game останавливается.
-/// - В режиме "normal": играет bg_game как MUSIC.
-/// - В зале: играет bg_audience как MUSIC.
-/// - SFX: intro/first_question/hints/answer_locked (по одному).
 
 let muted = false;
 
 const audio = {
-  music: new Audio(), // loop channel
-  sfx: new Audio()    // one-shot channel (also used for answer_locked)
+  music: new Audio(), // loop channel (used for CLOCK_TICK or BG_AUDIENCE)
+  sfx: new Audio()    // one-shot/loop (only one at a time)
 };
 
 audio.music.loop = true;
-audio.music.volume = 0.55;
-
+audio.music.volume = 0.60;
 audio.sfx.loop = false;
-audio.sfx.volume = 0.85;
+audio.sfx.volume = 0.90;
 
 function applyMuteState(){
   audio.music.muted = muted;
   audio.sfx.muted = muted;
   const btn = $("#btnMute");
-  if(!btn) return;
-  btn.textContent = muted ? "🔇" : "🔊";
-  btn.classList.toggle("muted", muted);
+  if(btn){
+    btn.textContent = muted ? "🔇" : "🔊";
+    btn.classList.toggle("muted", muted);
+  }
 }
 
 function stopMusic(){
@@ -639,7 +588,8 @@ function stopMusic(){
 async function playMusic(path){
   if(muted) return;
   try{
-    if(audio.music.src !== new URL(path, location.href).href){
+    const abs = new URL(path, location.href).href;
+    if(audio.music.src !== abs){
       audio.music.pause();
       audio.music.currentTime = 0;
       audio.music.src = path;
@@ -655,7 +605,6 @@ function stopSfx(){
 async function playSfx(path, {loop=false} = {}){
   if(muted) return;
   try{
-    // only 1 sfx at a time (no overlap)
     audio.sfx.pause();
     audio.sfx.currentTime = 0;
     audio.sfx.src = path;
@@ -669,28 +618,21 @@ function stopAllAudio(){
   stopSfx();
 }
 
-/* Music modes to keep "max 2" */
 const MusicMode = {
-  GAME_BG: "GAME_BG",
-  THINKING_TICK: "THINKING_TICK",
-  AUDIENCE: "AUDIENCE",
-  NONE: "NONE"
+  NONE: "NONE",
+  THINK: "THINK",
+  AUDIENCE: "AUDIENCE"
 };
 let currentMusicMode = MusicMode.NONE;
 
 async function setMusicMode(mode){
   currentMusicMode = mode;
   if(muted) return;
-
   if(mode === MusicMode.NONE){
     stopMusic();
     return;
   }
-  if(mode === MusicMode.GAME_BG){
-    await playMusic(SOUND.BG_GAME);
-    return;
-  }
-  if(mode === MusicMode.THINKING_TICK){
+  if(mode === MusicMode.THINK){
     await playMusic(SOUND.CLOCK_TICK);
     return;
   }
@@ -791,18 +733,18 @@ function toggleLadder(){
   if(open) hideLadder(); else showLadder();
 }
 
-/* ===================== Pause ===================== */
+/* ===================== Urgency ===================== */
 function setUrgencyUI(on){
   document.body.classList.toggle("urgent", !!on);
 }
 
+/* ===================== Pause ===================== */
 function showPause(){
   if(phase === "modal") return;
   if(phase === "paused") return;
   pauseQuestionTimer();
-  stopSfx(); // stop answer_locked or anything
-  stopMusic(); // requested: music stops on pause
   setUrgencyUI(false);
+  stopAllAudio(); // requested: pause stops music too
   phase = "paused";
   setHintButtons();
   $("#pauseOverlay").style.display="flex";
@@ -813,15 +755,9 @@ function hidePause(){
   const anyVisible = $$(".answer").some(a=>!a.classList.contains("hidden"));
   phase = anyVisible ? "answering" : "idle";
   setHintButtons();
-
-  // resume only if answering
   if(phase === "answering"){
     startQuestionTimer();
-    // back to thinking tick OR game bg based on remaining time
-    // We'll treat "thinking" as always tick while timer runs to keep max-2 rule.
-    setMusicMode(MusicMode.THINKING_TICK);
-  }else{
-    setMusicMode(MusicMode.GAME_BG);
+    setMusicMode(MusicMode.THINK);
   }
 }
 
@@ -846,7 +782,7 @@ function resetAnswersUI(){
   });
   selected = null;
   $("#confirm").disabled = true;
-  stopSfx(); // stop answer_locked
+  stopSfx();
 }
 function setHeader(){
   $("#questionCounter").textContent = `${current+1}/${questions.length}`;
@@ -860,7 +796,7 @@ function setHintButtons(){
   $("#hintCall").disabled = !hints.call || !canInteract();
 }
 
-/* ===================== Timer + urgency (<=10) ===================== */
+/* ===================== Timer ===================== */
 function stopQuestionTimer(){
   if(qInterval){ clearInterval(qInterval); qInterval=null; }
 }
@@ -874,17 +810,33 @@ function startQuestionTimer(){
   qRemaining = questionTime;
   updateTimerUI();
 
-  qInterval = setInterval(()=>{
+  qInterval = setInterval(async ()=>{
     qRemaining--;
     updateTimerUI();
+
     if(qRemaining <= 0){
       stopQuestionTimer();
       setUrgencyUI(false);
+      await lockInAndStopRoundAudio();   // lock-in sound and stop round music
       onTimeout();
     }
   },1000);
 }
 function pauseQuestionTimer(){ stopQuestionTimer(); }
+
+/* ===================== Round audio transitions ===================== */
+async function startThinkingAudio(){
+  // during thinking: only ticking as music
+  await setMusicMode(MusicMode.THINK);
+}
+function stopRoundMusic(){
+  setMusicMode(MusicMode.NONE);
+}
+async function lockInAndStopRoundAudio(){
+  // when answer chosen OR time out: play lock_in + stop round music
+  stopRoundMusic();
+  await playSfx(SOUND.LOCK_IN);
+}
 
 /* ===================== Round flow ===================== */
 async function startRound(){
@@ -901,6 +853,10 @@ async function startRound(){
   const q = questions[current];
   $("#question").textContent = q.q;
   $$(".answer .text").forEach((t,i)=> t.textContent = q.a[i]);
+
+  // between rounds no music
+  stopRoundMusic();
+  stopSfx();
 
   showModal({
     title:`Вопрос ${current+1}`,
@@ -924,7 +880,6 @@ async function revealAnswersAndStart(){
 
   const delayMs = Math.max(0, Number(answerRevealDelay||0)) * 1000;
 
-  // SFX: "Итак, первый вопрос..." (не накладываем - sfx канал один)
   await playSfx(SOUND.FIRST_QUESTION);
 
   for(let i=0;i<4;i++){
@@ -935,9 +890,7 @@ async function revealAnswersAndStart(){
   phase = "answering";
   setHintButtons();
   startQuestionTimer();
-
-  // music during thinking: ticking (max 2 channels rule)
-  await setMusicMode(MusicMode.THINKING_TICK);
+  await startThinkingAudio();
 }
 
 /* ===================== Answers ===================== */
@@ -951,7 +904,7 @@ function selectAnswer(i){
   el.classList.add("selected");
   $("#confirm").disabled = false;
 
-  // SFX: answer accepted (loop until confirm) – BUT still only 1 sfx at a time
+  // your "answer accepted" while waiting confirm (loop on SFX channel)
   playSfx(SOUND.ANSWER_LOCKED, {loop:true});
 }
 
@@ -965,18 +918,20 @@ async function confirmAnswer(){
   pauseQuestionTimer();
   setUrgencyUI(false);
 
-  // stop answer_locked
-  stopSfx();
+  stopSfx(); // stop answer_locked loop
 
-  // switch music back to game bg while showing result (optional)
-  await setMusicMode(MusicMode.GAME_BG);
+  // lock-in sound and stop thinking music
+  await lockInAndStopRoundAudio();
 
   const q = questions[current];
   const ans = $$(".answer");
 
   if(selected === q.c){
     ans[selected].classList.add("correct");
-    await sleep(900);
+
+    // play correct during pause (no other music)
+    await playSfx(SOUND.CORRECT_HARD);
+    await sleep(300);
 
     current++;
     if(current >= questions.length){ showWin(); return; }
@@ -991,9 +946,10 @@ async function confirmAnswer(){
     ans[selected].classList.add("wrong");
     ans[q.c].classList.add("correct");
 
-    const fallback = currentGuaranteed();
-    await sleep(650);
+    await playSfx(SOUND.WRONG);
+    await sleep(200);
 
+    const fallback = currentGuaranteed();
     phase = "modal";
     showModal({
       title:"Неправильно",
@@ -1009,9 +965,6 @@ async function confirmAnswer(){
 
 function onTimeout(){
   phase = "modal";
-  // stop music to make timeout feel "silent" or keep bg_game — choose. We'll keep game bg.
-  setMusicMode(MusicMode.GAME_BG);
-
   const fallback = currentGuaranteed();
   showModal({
     title:"Время вышло",
@@ -1027,9 +980,8 @@ function onTimeout(){
 function showWin(){
   pauseQuestionTimer();
   setUrgencyUI(false);
+  stopAllAudio();
   phase = "modal";
-  setMusicMode(MusicMode.GAME_BG);
-
   const win = moneyLevels[Math.min(questions.length, moneyLevels.length)-1] || 0;
   showModal({
     title:"Победа!",
@@ -1053,33 +1005,24 @@ function disableAnswer(i){
     stopSfx();
   }
 }
-
 async function hint5050(){
   if(!canInteract() || !hints.fifty) return;
   hints.fifty=false;
-
   await playSfx(SOUND.HINT_5050);
-
   const q = questions[current];
   const wrong = [0,1,2,3].filter(i=>i!==q.c);
   shuffle(wrong).slice(0,2).forEach(disableAnswer);
-
   setHintButtons();
 }
-
 async function hintRemoveOne(){
   if(!canInteract() || !hints.removeOne) return;
   hints.removeOne=false;
-
   await playSfx(SOUND.HINT_5050);
-
   const q = questions[current];
   const wrong = [0,1,2,3].filter(i=>i!==q.c);
   disableAnswer(wrong[Math.floor(Math.random()*wrong.length)]);
-
   setHintButtons();
 }
-
 async function hintAudience(){
   if(!canInteract() || !hints.audience) return;
   hints.audience=false;
@@ -1087,11 +1030,9 @@ async function hintAudience(){
   pauseQuestionTimer();
   setUrgencyUI(false);
   stopSfx(); // stop answer_locked
+  stopRoundMusic();
 
-  // sfx: click hint
   await playSfx(SOUND.HINT_AUDIENCE);
-
-  // music: audience bg (only one music)
   await setMusicMode(MusicMode.AUDIENCE);
 
   phase="modal";
@@ -1124,22 +1065,23 @@ async function hintAudience(){
     bodyHtml:`<p>Результаты голосования:</p>${rows}`,
     buttons:[{text:"Продолжить", className:"primary", onClick: async ()=>{
       hideModal();
+      stopRoundMusic();              // stop audience music
       phase="answering";
       setHintButtons();
       startQuestionTimer();
-      await setMusicMode(MusicMode.THINKING_TICK);
+      await startThinkingAudio();
     }}],
     dismissible:false
   });
 }
-
 async function hintCall(){
   if(!canInteract() || !hints.call) return;
   hints.call=false;
 
   pauseQuestionTimer();
   setUrgencyUI(false);
-  stopSfx(); // stop answer_locked
+  stopSfx();
+  stopRoundMusic();
   phase="modal";
   setHintButtons();
 
@@ -1175,7 +1117,7 @@ async function hintCall(){
     phase="answering";
     setHintButtons();
     startQuestionTimer();
-    await setMusicMode(MusicMode.THINKING_TICK);
+    await startThinkingAudio();
     if(auto) {}
   }
 }
@@ -1201,7 +1143,6 @@ function exportJSON(){
   a.remove();
   URL.revokeObjectURL(a.href);
 }
-
 function importJSON(){ $("#importFile").click(); }
 $("#importFile").addEventListener("change", async (e)=>{
   const file = e.target.files && e.target.files[0];
@@ -1223,6 +1164,9 @@ $("#importFile").addEventListener("change", async (e)=>{
 /* ===================== Start / Reset ===================== */
 function resetGame(){
   pauseQuestionTimer();
+  setUrgencyUI(false);
+  stopAllAudio();
+
   current=0;
   selected=null;
   phase="idle";
@@ -1251,10 +1195,6 @@ function resetGame(){
   resetAnswersUI();
   setHintButtons();
   $("#next").style.display="none";
-  setUrgencyUI(false);
-
-  // default background while between rounds
-  setMusicMode(MusicMode.GAME_BG);
 
   startRound();
 }
@@ -1278,10 +1218,9 @@ async function startGame(){
 
   $("#setup").style.display="none";
   $("#quiz").style.display="block";
-
   applyMuteState();
 
-  // start with intro in SFX channel
+  // intro only, no background
   await playSfx(SOUND.INTRO);
 
   resetGame();
@@ -1294,9 +1233,11 @@ $("#clearBtn").addEventListener("click", ()=>{ $("#questionsInput").value=""; })
 $$(".answer").forEach(el=>{
   el.addEventListener("click", ()=> selectAnswer(Number(el.dataset.i)));
 });
-
 $("#confirm").addEventListener("click", confirmAnswer);
-$("#next").addEventListener("click", ()=>{
+
+$("#next").addEventListener("click", async ()=>{
+  // next question sound (no background)
+  await playSfx(SOUND.NEXT_QUESTION);
   hideLadder();
   startRound();
 });
@@ -1326,21 +1267,15 @@ $("#pauseToMenu").addEventListener("click", ()=>{
   pauseQuestionTimer();
   setUrgencyUI(false);
   stopAllAudio();
-
   phase="idle";
   $("#quiz").style.display="none";
   $("#setup").style.display="block";
 });
 
-$("#btnMute").addEventListener("click", async ()=>{
+$("#btnMute").addEventListener("click", ()=>{
   muted = !muted;
   applyMuteState();
-  if(muted){
-    stopAllAudio();
-  }else{
-    // resume appropriate music mode only (no sfx auto)
-    await setMusicMode(currentMusicMode === MusicMode.NONE ? MusicMode.GAME_BG : currentMusicMode);
-  }
+  if(muted) stopAllAudio();
 });
 
 $("#hint5050").addEventListener("click", hint5050);
@@ -1357,9 +1292,6 @@ window.addEventListener("keydown", (e)=>{
     else showPause();
   }
 });
-
-// initialize mute button state (when on setup it doesn't exist; safe)
-document.addEventListener("DOMContentLoaded", applyMuteState);
 </script>
 </body>
 </html>
