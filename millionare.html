@@ -400,9 +400,11 @@
           <div class="field">
             <label>Звуки (папка <b>audio</b>)</label>
             <div class="hintText">
-              <b>audio/intro.mp3</b>, <b>audio/first_question.mp3</b>, <b>audio/clock_tick.mp3</b>, <b>audio/lock_in.mp3</b>,<br>
-              <b>audio/answer_locked.mp3</b>, <b>audio/hint_5050.mp3</b>, <b>audio/hint_audience.mp3</b>, <b>audio/bg_audience.mp3</b>,<br>
-              <b>audio/correct_hard.mp3</b>, <b>audio/wrong.mp3</b>, <b>audio/next_question.mp3</b>
+              intro.mp3, first_question.mp3, clock_tick.mp3, lock_in.mp3, answer_locked.mp3,<br>
+              hint_5050.mp3, hint_audience.mp3, bg_audience.mp3, correct_hard.mp3, wrong.mp3, next_question.mp3
+            </div>
+            <div class="hintText">
+              Важно: открывай через http:// (локальный сервер), не file://.
             </div>
           </div>
 
@@ -498,7 +500,6 @@ const moneyLevels = [
   100,200,300,500,1000,2000,4000,8000,
   16000,32000,64000,125000,250000,500000,1000000
 ];
-
 const $ = (s)=>document.querySelector(s);
 const $$ = (s)=>Array.from(document.querySelectorAll(s));
 const sleep = (ms)=>new Promise(r=>setTimeout(r,ms));
@@ -545,7 +546,16 @@ function hideModal(){
   o.onclick = null;
 }
 
-/* ===================== Audio (max 2 simultaneous: music + sfx) ===================== */
+/* ===================== Audio (fix intro not playing) ===================== */
+/*
+  NOTE: intro often doesn't play if:
+    - page opened via file:// (CORS/codec quirks)
+    - mp3 codec not supported or file path wrong
+    - audio not "unlocked" by user gesture (mobile)
+  We fix by:
+    1) calling unlockAudio() inside the Start button click
+    2) preloading intro (load) and playing from user gesture async
+*/
 const SOUND = {
   INTRO: "audio/intro.mp3",
   FIRST_QUESTION: "audio/first_question.mp3",
@@ -561,12 +571,12 @@ const SOUND = {
 };
 
 let muted = false;
+let audioUnlocked = false;
 
 const audio = {
-  music: new Audio(), // loop channel (used for CLOCK_TICK or BG_AUDIENCE)
-  sfx: new Audio()    // one-shot/loop (only one at a time)
+  music: new Audio(),
+  sfx: new Audio()
 };
-
 audio.music.loop = true;
 audio.music.volume = 0.60;
 audio.sfx.loop = false;
@@ -618,27 +628,35 @@ function stopAllAudio(){
   stopSfx();
 }
 
-const MusicMode = {
-  NONE: "NONE",
-  THINK: "THINK",
-  AUDIENCE: "AUDIENCE"
-};
+const MusicMode = { NONE:"NONE", THINK:"THINK", AUDIENCE:"AUDIENCE" };
 let currentMusicMode = MusicMode.NONE;
-
 async function setMusicMode(mode){
   currentMusicMode = mode;
   if(muted) return;
-  if(mode === MusicMode.NONE){
-    stopMusic();
-    return;
-  }
-  if(mode === MusicMode.THINK){
-    await playMusic(SOUND.CLOCK_TICK);
-    return;
-  }
-  if(mode === MusicMode.AUDIENCE){
-    await playMusic(SOUND.BG_AUDIENCE);
-    return;
+  if(mode === MusicMode.NONE){ stopMusic(); return; }
+  if(mode === MusicMode.THINK){ await playMusic(SOUND.CLOCK_TICK); return; }
+  if(mode === MusicMode.AUDIENCE){ await playMusic(SOUND.BG_AUDIENCE); return; }
+}
+
+// Unlock audio reliably on mobile by attempting a silent/quick play inside user gesture
+async function unlockAudio(){
+  if(audioUnlocked) return;
+  try{
+    // preload intro early
+    audio.sfx.src = SOUND.INTRO;
+    audio.sfx.load();
+
+    // try a tiny play/pause to unlock (some browsers require it)
+    audio.sfx.muted = true;
+    await audio.sfx.play();
+    audio.sfx.pause();
+    audio.sfx.currentTime = 0;
+    audio.sfx.muted = muted;
+
+    audioUnlocked = true;
+  }catch(e){
+    // Even if fails, we still continue; next play attempt might succeed
+    audioUnlocked = true;
   }
 }
 
@@ -744,7 +762,7 @@ function showPause(){
   if(phase === "paused") return;
   pauseQuestionTimer();
   setUrgencyUI(false);
-  stopAllAudio(); // requested: pause stops music too
+  stopAllAudio();
   phase = "paused";
   setHintButtons();
   $("#pauseOverlay").style.display="flex";
@@ -817,7 +835,7 @@ function startQuestionTimer(){
     if(qRemaining <= 0){
       stopQuestionTimer();
       setUrgencyUI(false);
-      await lockInAndStopRoundAudio();   // lock-in sound and stop round music
+      await lockInAndStopRoundAudio();
       onTimeout();
     }
   },1000);
@@ -826,14 +844,12 @@ function pauseQuestionTimer(){ stopQuestionTimer(); }
 
 /* ===================== Round audio transitions ===================== */
 async function startThinkingAudio(){
-  // during thinking: only ticking as music
   await setMusicMode(MusicMode.THINK);
 }
 function stopRoundMusic(){
   setMusicMode(MusicMode.NONE);
 }
 async function lockInAndStopRoundAudio(){
-  // when answer chosen OR time out: play lock_in + stop round music
   stopRoundMusic();
   await playSfx(SOUND.LOCK_IN);
 }
@@ -854,7 +870,6 @@ async function startRound(){
   $("#question").textContent = q.q;
   $$(".answer .text").forEach((t,i)=> t.textContent = q.a[i]);
 
-  // between rounds no music
   stopRoundMusic();
   stopSfx();
 
@@ -904,7 +919,6 @@ function selectAnswer(i){
   el.classList.add("selected");
   $("#confirm").disabled = false;
 
-  // your "answer accepted" while waiting confirm (loop on SFX channel)
   playSfx(SOUND.ANSWER_LOCKED, {loop:true});
 }
 
@@ -918,9 +932,7 @@ async function confirmAnswer(){
   pauseQuestionTimer();
   setUrgencyUI(false);
 
-  stopSfx(); // stop answer_locked loop
-
-  // lock-in sound and stop thinking music
+  stopSfx();
   await lockInAndStopRoundAudio();
 
   const q = questions[current];
@@ -929,9 +941,8 @@ async function confirmAnswer(){
   if(selected === q.c){
     ans[selected].classList.add("correct");
 
-    // play correct during pause (no other music)
     await playSfx(SOUND.CORRECT_HARD);
-    await sleep(300);
+    await sleep(250);
 
     current++;
     if(current >= questions.length){ showWin(); return; }
@@ -1029,7 +1040,7 @@ async function hintAudience(){
 
   pauseQuestionTimer();
   setUrgencyUI(false);
-  stopSfx(); // stop answer_locked
+  stopSfx();
   stopRoundMusic();
 
   await playSfx(SOUND.HINT_AUDIENCE);
@@ -1065,7 +1076,7 @@ async function hintAudience(){
     bodyHtml:`<p>Результаты голосования:</p>${rows}`,
     buttons:[{text:"Продолжить", className:"primary", onClick: async ()=>{
       hideModal();
-      stopRoundMusic();              // stop audience music
+      stopRoundMusic();
       phase="answering";
       setHintButtons();
       startQuestionTimer();
@@ -1218,16 +1229,18 @@ async function startGame(){
 
   $("#setup").style.display="none";
   $("#quiz").style.display="block";
+
   applyMuteState();
 
-  // intro only, no background
+  // unlock + then play intro (this is the key change)
+  await unlockAudio();
   await playSfx(SOUND.INTRO);
 
   resetGame();
 }
 
 /* ===================== Events ===================== */
-$("#startBtn").addEventListener("click", ()=>startGame());
+$("#startBtn").addEventListener("click", ()=> startGame());
 $("#clearBtn").addEventListener("click", ()=>{ $("#questionsInput").value=""; });
 
 $$(".answer").forEach(el=>{
@@ -1236,7 +1249,6 @@ $$(".answer").forEach(el=>{
 $("#confirm").addEventListener("click", confirmAnswer);
 
 $("#next").addEventListener("click", async ()=>{
-  // next question sound (no background)
   await playSfx(SOUND.NEXT_QUESTION);
   hideLadder();
   startRound();
